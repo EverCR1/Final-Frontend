@@ -3,7 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\AuthController;
 use App\Http\Controllers\Web\DashboardController;
-use App\Http\Controllers\Web\AnimalController; 
+use App\Http\Controllers\Web\AnimalController;
+use App\Http\Controllers\Web\FincaController;  
 
 /*
 |--------------------------------------------------------------------------
@@ -17,25 +18,97 @@ use App\Http\Controllers\Web\AnimalController;
 */
 
 // Rutas de autenticación
+// Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+// Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+// Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// // Ruta principal redirige a login
+// Route::get('/', function () {
+//     return redirect()->route('login');
+// });
+
+// // Rutas protegidas
+// Route::middleware('web.auth')->group(function () {
+//     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+//     // Animales
+//     Route::get('/animals', [AnimalController::class, 'index'])->name('animals.index');
+//     Route::get('/animals/create', [AnimalController::class, 'create'])->name('animals.create');
+//     Route::post('/animals', [AnimalController::class, 'store'])->name('animals.store');
+//     Route::get('/animals/{id}', [AnimalController::class, 'show'])->name('animals.show');
+//     Route::get('/animals/{id}/edit', [AnimalController::class, 'edit'])->name('animals.edit');
+//     Route::put('/animals/{id}', [AnimalController::class, 'update'])->name('animals.update');
+//     Route::delete('/animals/{id}', [AnimalController::class, 'destroy'])->name('animals.destroy');
+
+//     // Fincas
+//     Route::get('/fincas', [FincaController::class, 'index'])->name('fincas.index');
+//     Route::get('/fincas/create', [FincaController::class, 'create'])->name('fincas.create');
+//     Route::post('/fincas', [FincaController::class, 'store'])->name('fincas.store');
+//     Route::get('/fincas/{id}', [FincaController::class, 'show'])->name('fincas.show');
+//     Route::get('/fincas/{id}/edit', [FincaController::class, 'edit'])->name('fincas.edit');
+//     Route::put('/fincas/{id}', [FincaController::class, 'update'])->name('fincas.update');
+//     Route::delete('/fincas/{id}', [FincaController::class, 'destroy'])->name('fincas.destroy');
+
+//     // Medicamentos
+//     Route::get('/medicamentos', [MedicamentoController::class, 'index'])->name('medicamentos.index');
+//     Route::get('/medicamentos/create', [MedicamentoController::class, 'create'])->name('medicamentos.create');
+//     Route::post('/medicamentos', [MedicamentoController::class, 'store'])->name('medicamentos.store');
+//     Route::get('/medicamentos/{id}', [MedicamentoController::class, 'show'])->name('medicamentos.show');
+//     Route::get('/medicamentos/{id}/edit', [MedicamentoController::class, 'edit'])->name('medicamentos.edit');
+//     Route::put('/medicamentos/{id}', [MedicamentoController::class, 'update'])->name('medicamentos.update');
+//     Route::delete('/medicamentos/{id}', [MedicamentoController::class, 'destroy'])->name('medicamentos.destroy');
+//     Route::get('/medicamentos/stock/bajo', [MedicamentoController::class, 'stockBajo'])->name('medicamentos.stock-bajo');
+// });
+
+// Rutas protegidas con roles
+// Rutas PÚBLICAS
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout'); // ✅ AGREGAR ESTA LÍNEA
 
-// Ruta principal redirige a login
+// Ruta principal
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Rutas protegidas
-Route::middleware('web.auth')->group(function () {
+// ================= RUTAS PROTEGIDAS =================
+Route::middleware(['web.auth'])->group(function () {
+    
+    // DASHBOARD - Todos los roles
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Animales
+    // ========== ANIMALES ==========
+    // Index y Show - Todos los roles
+    // RUTAS ESPECÍFICAS PRIMERO 
+    Route::get('/animals/create', [AnimalController::class, 'create'])
+        ->name('animals.create')
+        ->middleware(['role:admin,veterinario']); // Proteger directamente en la ruta
+
+    // Luego las rutas con parámetros
     Route::get('/animals', [AnimalController::class, 'index'])->name('animals.index');
-    Route::get('/animals/create', [AnimalController::class, 'create'])->name('animals.create');
-    Route::post('/animals', [AnimalController::class, 'store'])->name('animals.store');
     Route::get('/animals/{id}', [AnimalController::class, 'show'])->name('animals.show');
-    Route::get('/animals/{id}/edit', [AnimalController::class, 'edit'])->name('animals.edit');
-    Route::put('/animals/{id}', [AnimalController::class, 'update'])->name('animals.update');
-    Route::delete('/animals/{id}', [AnimalController::class, 'destroy'])->name('animals.destroy');
+
+    // Resto de rutas protegidas
+    Route::middleware(['role:admin,veterinario'])->group(function () {
+        Route::post('/animals', [AnimalController::class, 'store'])->name('animals.store');
+        Route::get('/animals/{id}/edit', [AnimalController::class, 'edit'])->name('animals.edit');
+        Route::put('/animals/{id}', [AnimalController::class, 'update'])->name('animals.update');
+    });
+    
+    // Eliminar - Solo Admin
+    Route::middleware(['role:admin'])->group(function () {
+        Route::delete('/animals/{id}', [AnimalController::class, 'destroy'])->name('animals.destroy');
+    });
+    
+    // ========== FINCAS ==========
+    // Solo Admin
+    Route::middleware(['role:admin'])->group(function () {
+        Route::get('/fincas', [FincaController::class, 'index'])->name('fincas.index');
+        Route::get('/fincas/create', [FincaController::class, 'create'])->name('fincas.create');
+        Route::post('/fincas', [FincaController::class, 'store'])->name('fincas.store');
+        Route::get('/fincas/{id}', [FincaController::class, 'show'])->name('fincas.show');
+        Route::get('/fincas/{id}/edit', [FincaController::class, 'edit'])->name('fincas.edit');
+        Route::put('/fincas/{id}', [FincaController::class, 'update'])->name('fincas.update');
+        Route::delete('/fincas/{id}', [FincaController::class, 'destroy'])->name('fincas.destroy');
+    });
 });

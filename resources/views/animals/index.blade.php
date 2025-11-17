@@ -9,12 +9,16 @@
         <h1 class="h3 mb-0 text-gray-800">
             <i class="fas fa-cow text-success"></i> Gestión de Animales
         </h1>
+        
+        <!-- Botón Nuevo Animal - Solo Admin y Veterinario -->
+        @if(in_array(session('user.role'), ['admin', 'veterinario']))
         <a href="{{ route('animals.create') }}" class="btn btn-success btn-icon-split">
             <span class="icon text-white-50">
                 <i class="fas fa-plus"></i>
             </span>
             <span class="text">Nuevo Animal</span>
         </a>
+        @endif
     </div>
 
     @if(session('success'))
@@ -28,6 +32,14 @@
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
         <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    @endif
+
+    <!-- Información de permisos para Productor -->
+    @if(session('user.role') === 'productor')
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="fas fa-info-circle me-2"></i>
+        <strong>Modo Consulta:</strong> Como productor, tienes acceso de solo lectura a la información de animales.
     </div>
     @endif
 
@@ -115,18 +127,26 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Ver - Todos los roles -->
                                     <a href="{{ route('animals.show', $animal['id']) }}" 
                                        class="btn btn-info btn-sm" 
                                        title="Ver detalles"
                                        data-bs-toggle="tooltip">
                                         <i class="fas fa-eye"></i>
                                     </a>
+                                    
+                                    <!-- Editar - Solo Admin y Veterinario -->
+                                    @if(in_array(session('user.role'), ['admin', 'veterinario']))
                                     <a href="{{ route('animals.edit', $animal['id']) }}" 
                                        class="btn btn-warning btn-sm"
                                        title="Editar"
                                        data-bs-toggle="tooltip">
                                         <i class="fas fa-edit"></i>
                                     </a>
+                                    @endif
+                                    
+                                    <!-- Eliminar - Solo Admin -->
+                                    @if(session('user.role') === 'admin')
                                     <form action="{{ route('animals.destroy', $animal['id']) }}" 
                                           method="POST" class="d-inline"
                                           onsubmit="return confirm('¿Estás seguro de eliminar el animal {{ $animal['identificacion'] }}?')">
@@ -138,6 +158,7 @@
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
@@ -152,9 +173,17 @@
                     <h4 class="text-muted">No hay animales registrados</h4>
                     <p class="text-muted">Comienza agregando el primer animal al sistema</p>
                 </div>
+                <!-- Botón solo para Admin y Veterinario -->
+                @if(in_array(session('user.role'), ['admin', 'veterinario']))
                 <a href="{{ route('animals.create') }}" class="btn btn-success btn-lg">
                     <i class="fas fa-plus me-2"></i>Registrar Primer Animal
                 </a>
+                @else
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Contacta al administrador para registrar animales en el sistema.
+                </div>
+                @endif
             </div>
             @endif
         </div>
