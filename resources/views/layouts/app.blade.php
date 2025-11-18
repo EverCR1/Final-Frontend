@@ -83,22 +83,22 @@
                     
                     <!-- Vacunaciones - Admin y Veterinario -->
                     @if(in_array(session('user.role'), ['admin', 'veterinario']))
-                    <a class="nav-link {{ request()->routeIs('vacunaciones.*') ? 'active' : '' }}" 
-                       href="#">
+                    <a class="nav-link {{ request()->routeIs('vacunaciones.#') ? 'active' : '' }}" 
+                       href="{{ route('vacunaciones.index') }}">
                         <i class="fas fa-syringe me-2"></i> Vacunaciones
                     </a>
                     @endif
                     
                     <!-- Producción Leche - Todos los roles -->
                     <a class="nav-link {{ request()->routeIs('produccion-leche.*') ? 'active' : '' }}" 
-                       href="#">
+                       href="{{ route('produccion-leche.index') }}">
                         <i class="fas fa-wine-bottle me-2"></i> Producción Leche
                     </a>
                     
                     <!-- Medicamentos - Admin y Veterinario -->
                     @if(in_array(session('user.role'), ['admin', 'veterinario']))
                     <a class="nav-link {{ request()->routeIs('medicamentos.*') ? 'active' : '' }}" 
-                       href="#">
+                       href="{{ route('medicamentos.index') }}">
                         <i class="fas fa-pills me-2"></i> Medicamentos
                     </a>
                     @endif
