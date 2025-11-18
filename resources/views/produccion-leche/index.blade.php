@@ -121,7 +121,7 @@
                 <table class="table table-bordered table-hover table-striped" id="produccionesTable" width="100%" cellspacing="0">
                     <thead class="table-warning">
                         <tr>
-                            <th>ID</th>
+                            <th>No.</th>
                             <th>Fecha</th>
                             <th>Animal</th>
                             <th>Finca</th>
@@ -133,9 +133,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($producciones as $produccion)
+                        @foreach($producciones as $index => $produccion)
                         <tr>
-                            <td><strong>#{{ $produccion['id'] }}</strong></td>
+                            <td><strong>#{{ $index + 1 }}</strong></td>
                             <td>
                                 <strong>{{ \Carbon\Carbon::parse($produccion['fecha'])->format('d/m/Y') }}</strong>
                             </td>

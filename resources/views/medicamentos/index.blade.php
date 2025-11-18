@@ -36,7 +36,7 @@
                 <table class="table table-bordered table-hover table-striped" id="medicamentosTable" width="100%" cellspacing="0">
                     <thead class="table-info">
                         <tr>
-                            <th>ID</th>
+                            <th>No.</th>
                             <th>Nombre</th>
                             <th>Tipo</th>
                             <th>Finca</th>
@@ -50,9 +50,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($medicamentos as $medicamento)
+                        @foreach($medicamentos as $index => $medicamento)
                         <tr>
-                            <td><strong>#{{ $medicamento['id'] }}</strong></td>
+                            <td><strong>#{{ $index + 1 }}</strong></td>
                             <td>
                                 <strong>{{ $medicamento['nombre'] }}</strong>
                                 @if($medicamento['descripcion'])
@@ -138,7 +138,7 @@
                                        class="btn btn-warning" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    @if(session('user.role') === 'admin')
+                                    @if(in_array(session('user.role'), ['admin', 'veterinario']))
                                     <form action="{{ route('medicamentos.destroy', $medicamento['id']) }}" 
                                           method="POST" class="d-inline"
                                           onsubmit="return confirm('¿Estás seguro de eliminar este medicamento?')">

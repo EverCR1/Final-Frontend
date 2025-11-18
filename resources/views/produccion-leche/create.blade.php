@@ -48,9 +48,9 @@
                     <div class="col-md-6 mb-3">
                         <label for="fecha" class="form-label">Fecha <span class="text-danger">*</span></label>
                         <input type="date" class="form-control" 
-                               id="fecha" name="fecha" 
-                               value="{{ old('fecha', date('Y-m-d')) }}" 
-                               max="{{ date('Y-m-d') }}" required>
+                            id="fecha" name="fecha" 
+                            value="{{ old('fecha', now()->format('Y-m-d')) }}" 
+                            max="{{ now()->format('Y-m-d') }}" required>
                         <small class="form-text text-muted">Fecha de la producción</small>
                     </div>
                 </div>

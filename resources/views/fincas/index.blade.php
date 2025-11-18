@@ -35,7 +35,7 @@
                 <table class="table table-bordered table-hover table-striped" id="fincasTable" width="100%" cellspacing="0">
                     <thead class="table-success">
                         <tr>
-                            <th>ID</th>
+                            <th>No.</th>
                             <th>Nombre</th>
                             <th>Ubicación</th>
                             <th>Zona</th>
@@ -48,9 +48,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($fincas as $finca)
+                        @foreach($fincas as $index => $finca)
                         <tr>
-                            <td><strong>#{{ $finca['id'] }}</strong></td>
+                            <td><strong>#{{ $index + 1 }}</strong></td>
                             <td>
                                 <strong>{{ $finca['nombre'] }}</strong>
                             </td>

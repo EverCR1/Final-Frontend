@@ -36,7 +36,7 @@
                 <table class="table table-bordered table-hover table-striped" id="usersTable" width="100%" cellspacing="0">
                     <thead class="table-primary">
                         <tr>
-                            <th>ID</th>
+                            <th>No.</th>
                             <th>Nombre</th>
                             <th>Email</th>
                             <th>Rol</th>
@@ -48,9 +48,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($users as $user)
+                        @foreach($users as $index => $user)
                         <tr>
-                            <td><strong>#{{ $user['id'] }}</strong></td>
+                            <td><strong>#{{ $index + 1 }}</strong></td>
                             <td>
                                 <strong>{{ $user['name'] }}</strong>
                                 @if($user['id'] === session('user.id'))

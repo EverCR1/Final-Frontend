@@ -36,7 +36,7 @@
                 <table class="table table-bordered table-hover table-striped" id="vacunacionesTable" width="100%" cellspacing="0">
                     <thead class="table-primary">
                         <tr>
-                            <th>ID</th>
+                            <th>No.</th>
                             <th>Fecha</th>
                             <th>Animal</th>
                             <th>Finca</th>
@@ -51,9 +51,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($vacunaciones as $vacunacion)
+                        @foreach($vacunaciones as $index => $vacunacion)
                         <tr>
-                            <td><strong>#{{ $vacunacion['id'] }}</strong></td>
+                            <td><strong>#{{ $index + 1 }}</strong></td>
                             <td>
                                 <strong>{{ \Carbon\Carbon::parse($vacunacion['fecha_vacunacion'])->format('d/m/Y') }}</strong>
                             </td>
@@ -132,7 +132,7 @@
                                        class="btn btn-warning" title="Editar">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    @if(session('user.role') === 'admin')
+                                    @if(in_array(session('user.role'), ['admin', 'veterinario']))
                                     <form action="{{ route('vacunaciones.destroy', $vacunacion['id']) }}" 
                                           method="POST" class="d-inline"
                                           onsubmit="return confirm('¿Estás seguro de eliminar este registro de vacunación?')">
