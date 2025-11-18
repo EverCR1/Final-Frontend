@@ -83,7 +83,15 @@
                     @if($animal['peso_inicial'])
                     <div class="row mt-3">
                         <div class="col-12">
-                            <p><strong>Peso Inicial:</strong> {{ $animal['peso_inicial'] }} kg</p>
+                            <p><strong>Peso Inicial:</strong> {{ $animal['peso_inicial'] }} lbs</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    @if($animal['peso_actual'])
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Peso Actual:</strong> {{ $animal['peso_actual'] }} lbs</p>
                         </div>
                     </div>
                     @endif

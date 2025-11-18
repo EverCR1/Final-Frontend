@@ -101,7 +101,7 @@
 
                     <!-- Precio Unitario -->
                     <div class="col-md-4 mb-3">
-                        <label for="precio_unitario" class="form-label">Precio Unitario ($)</label>
+                        <label for="precio_unitario" class="form-label">Precio Unitario (Q)</label>
                         <input type="number" step="0.01" class="form-control" 
                                id="precio_unitario" name="precio_unitario" 
                                value="{{ old('precio_unitario', $medicamento['precio_unitario']) }}" 

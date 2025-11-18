@@ -56,8 +56,7 @@
             <div class="sidebar">
                 <div class="p-3 text-center border-bottom">
                     <i class="fas fa-cow fa-2x text-success"></i>
-                    <h5 class="mt-2">Sistema Ganadero</h5>
-                    <small class="text-muted">CUNOR</small>
+                    <h5 class="mt-2">Ganaderos GUA S.A.</h5>
                 </div>
                 
                 <nav class="nav flex-column mt-3">
@@ -70,7 +69,7 @@
                     <!-- Animales - Todos los roles -->
                     <a class="nav-link {{ request()->routeIs('animals.*') ? 'active' : '' }}" 
                        href="{{ route('animals.index') }}">
-                        <i class="fas fa-cow me-2"></i> Animales
+                        <i class="fas fa-horse me-2"></i> Animales
                     </a>
                     
                     <!-- Fincas - Solo Admin -->
@@ -78,6 +77,14 @@
                     <a class="nav-link {{ request()->routeIs('fincas.*') ? 'active' : '' }}" 
                        href="{{ route('fincas.index') }}">
                         <i class="fas fa-tractor me-2"></i> Fincas
+                    </a>
+                    @endif
+
+                    <!-- Usuarios - Solo Admin -->
+                    @if(session('user.role') === 'admin')
+                    <a class="nav-link {{ request()->routeIs('usuarios.*') ? 'active' : '' }}" 
+                       href="{{ route('users.index') }}">
+                        <i class="fas fa-users me-2"></i> Usuarios
                     </a>
                     @endif
                     
@@ -105,46 +112,27 @@
                     
                     <!-- Reportes - Solo Admin -->
                     @if(session('user.role') === 'admin')
-                    <a class="nav-link {{ request()->routeIs('reportes.*') ? 'active' : '' }}" 
-                       href="#">
-                        <i class="fas fa-chart-bar me-2"></i> Reportes
-                    </a>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('reportes.index') }}">
+                            <i class="fas fa-chart-bar fa-fw me-2"></i>
+                            <span>Reportes</span>
+                        </a>
+                    </li>
                     @endif
                 </nav>
                 
-                <!-- Información del usuario -->
-                <div class="position-absolute bottom-0 start-0 end-0 p-3 border-top">
-                    <small class="text-muted d-block">
-                        <i class="fas fa-user me-1"></i>
-                        {{ session('user.name') }}
-                    </small>
-                    <small class="text-success">
-                        @php
-                            $roleLabels = [
-                                'admin' => 'Administrador',
-                                'veterinario' => 'Veterinario', 
-                                'productor' => 'Productor'
-                            ];
-                        @endphp
-                        {{ $roleLabels[session('user.role')] ?? session('user.role') }}
-                    </small>
-                </div>
+                
             </div>
 
             <!-- Main Content -->
             <div class="main-content">
-                <!-- Navbar Top -->
+                <!-- Navbar Top - SOLO información del usuario -->
                 <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
                     <div class="container-fluid">
-                        <span class="navbar-brand">
-                            @yield('title', 'Sistema Ganadero')
-                            @if(session('user.role') !== 'admin')
-                            <small class="text-muted ms-2">
-                                <i class="fas fa-user-shield me-1"></i>
-                                {{ session('user.role') === 'veterinario' ? 'Veterinario' : 'Productor' }}
-                            </small>
-                            @endif
-                        </span>
+                        <!-- Espacio vacío a la izquierda -->
+                        <span class="navbar-brand"></span>
+                        
+                        <!-- Información del usuario a la derecha -->
                         <div class="navbar-nav ms-auto">
                             <div class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" role="button" 
@@ -158,7 +146,15 @@
                                         {{ session('user.role') }}
                                     </span>
                                 </a>
-                                <ul class="dropdown-menu">
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li>
+                                        <span class="dropdown-item-text">
+                                            <small class="text-muted">
+                                                <i class="fas fa-user me-2"></i>
+                                                {{ session('user.name') }}
+                                            </small>
+                                        </span>
+                                    </li>
                                     <li>
                                         <span class="dropdown-item-text">
                                             <small class="text-muted">

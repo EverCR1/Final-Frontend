@@ -8,6 +8,8 @@ use App\Http\Controllers\Web\FincaController;
 use App\Http\Controllers\Web\MedicamentoController;  
 use App\Http\Controllers\Web\VacunacionController;
 use App\Http\Controllers\Web\ProduccionLecheController;  
+use App\Http\Controllers\Web\ReporteController;
+use App\Http\Controllers\Web\UserController;   
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +22,6 @@ use App\Http\Controllers\Web\ProduccionLecheController;
 |
 */
 
-// Rutas protegidas con roles
 // Rutas PÚBLICAS
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
@@ -104,9 +105,39 @@ Route::middleware(['web.auth'])->group(function () {
     Route::put('/produccion-leche/{id}', [ProduccionLecheController::class, 'update'])->name('produccion-leche.update');
     Route::delete('/produccion-leche/{id}', [ProduccionLecheController::class, 'destroy'])->name('produccion-leche.destroy');
 
-    // Reportes
+    // Reportes de Producción de Leche
     Route::get('/produccion-leche/reportes/form', [ProduccionLecheController::class, 'reportes'])->name('produccion-leche.reportes');
     Route::post('/produccion-leche/reportes/generar', [ProduccionLecheController::class, 'generarReporte'])->name('produccion-leche.generar-reporte');
+    Route::get('produccion-leche/grafica-dashboard', [ProduccionLecheController::class, 'datosGraficaDashboard'])
+    ->name('produccion-leche.grafica-dashboard');
+
+    // ========== REPORTES GENERALES ==========
+    // Solo Admin puede acceder
+    Route::middleware(['role:admin'])->group(function () {
+        Route::prefix('reportes')->group(function () {
+            Route::get('/', [ReporteController::class, 'index'])->name('reportes.index');
+            Route::get('/animales-por-finca', [ReporteController::class, 'animalesPorFinca'])->name('reportes.animales-finca');
+            Route::get('/produccion-mensual', [ReporteController::class, 'produccionMensual'])->name('reportes.produccion-mensual');
+            Route::get('/salud-animal', [ReporteController::class, 'reporteSalud'])->name('reportes.salud-animal');
+        });
+    });
+
+    // ========== USUARIOS ==========
+    // Solo Administrador
+    Route::middleware(['role:admin'])->group(function () {
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+    Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+    
+    // Rutas adicionales para usuarios
+    Route::get('/users/estadisticas', [UserController::class, 'estadisticas'])->name('users.estadisticas');
+    Route::get('/veterinarios', [UserController::class, 'veterinarios'])->name('users.veterinarios');
+    Route::get('/productores', [UserController::class, 'productores'])->name('users.productores');
+});
 });
 });
 });

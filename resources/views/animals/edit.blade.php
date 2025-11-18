@@ -17,11 +17,19 @@
         </a>
     </div>
 
+    <!-- Información de permisos para Veterinario -->
+    @if(session('user.role') === 'veterinario')
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="fas fa-user-md me-2"></i>
+        <strong>Modo Veterinario:</strong> Estás editando la información de un animal.
+    </div>
+    @endif
+
     <!-- Form -->
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-warning">
-                <i class="fas fa-pencil-alt me-2"></i>Editar Información del Animal
+                <i class="fas fa-edit me-2"></i>Editar Información del Animal
             </h6>
         </div>
         <div class="card-body">
@@ -33,19 +41,15 @@
                     <!-- Finca -->
                     <div class="col-md-6 mb-3">
                         <label for="finca_id" class="form-label">Finca <span class="text-danger">*</span></label>
-                        <select class="form-select @error('finca_id') is-invalid @enderror" 
-                                id="finca_id" name="finca_id" required>
+                        <select class="form-select" id="finca_id" name="finca_id" required>
                             <option value="">Seleccionar Finca</option>
                             @foreach($fincas as $finca)
                             <option value="{{ $finca['id'] }}" 
-                                {{ (old('finca_id', $animal['finca_id']) == $finca['id']) ? 'selected' : '' }}>
+                                {{ old('finca_id', $animal['finca_id']) == $finca['id'] ? 'selected' : '' }}>
                                 {{ $finca['nombre'] }} - {{ $finca['zona'] }}
                             </option>
                             @endforeach
                         </select>
-                        @error('finca_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <!-- Identificación -->
@@ -53,13 +57,11 @@
                         <label for="identificacion" class="form-label">
                             Identificación <span class="text-danger">*</span>
                         </label>
-                        <input type="text" class="form-control @error('identificacion') is-invalid @enderror" 
+                        <input type="text" class="form-control" 
                                id="identificacion" name="identificacion" 
                                value="{{ old('identificacion', $animal['identificacion']) }}" 
                                placeholder="Ej: BOV-001" required>
-                        @error('identificacion')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <small class="form-text text-muted">Identificación única del animal</small>
                     </div>
                 </div>
 
@@ -67,29 +69,22 @@
                     <!-- Nombre -->
                     <div class="col-md-6 mb-3">
                         <label for="nombre" class="form-label">Nombre</label>
-                        <input type="text" class="form-control @error('nombre') is-invalid @enderror" 
+                        <input type="text" class="form-control" 
                                id="nombre" name="nombre" 
                                value="{{ old('nombre', $animal['nombre']) }}" 
-                               placeholder="Nombre del animal">
-                        @error('nombre')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                               placeholder="Nombre del animal (opcional)">
                     </div>
 
                     <!-- Especie -->
                     <div class="col-md-6 mb-3">
                         <label for="especie" class="form-label">Especie <span class="text-danger">*</span></label>
-                        <select class="form-select @error('especie') is-invalid @enderror" 
-                                id="especie" name="especie" required>
+                        <select class="form-select" id="especie" name="especie" required>
                             <option value="">Seleccionar Especie</option>
-                            <option value="bovino" {{ (old('especie', $animal['especie']) == 'bovino') ? 'selected' : '' }}>Bovino</option>
-                            <option value="porcino" {{ (old('especie', $animal['especie']) == 'porcino') ? 'selected' : '' }}>Porcino</option>
-                            <option value="caprino" {{ (old('especie', $animal['especie']) == 'caprino') ? 'selected' : '' }}>Caprino</option>
-                            <option value="ovina" {{ (old('especie', $animal['especie']) == 'ovina') ? 'selected' : '' }}>Ovina</option>
+                            <option value="bovino" {{ old('especie', $animal['especie']) == 'bovino' ? 'selected' : '' }}>Bovino</option>
+                            <option value="porcino" {{ old('especie', $animal['especie']) == 'porcino' ? 'selected' : '' }}>Porcino</option>
+                            <option value="caprino" {{ old('especie', $animal['especie']) == 'caprino' ? 'selected' : '' }}>Caprino</option>
+                            <option value="ovina" {{ old('especie', $animal['especie']) == 'ovina' ? 'selected' : '' }}>Ovina</option>
                         </select>
-                        @error('especie')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
                 </div>
 
@@ -99,11 +94,11 @@
                         <label for="raza" class="form-label">Raza <span class="text-danger">*</span></label>
                         <select class="form-select" id="raza" name="raza" required>
                             <option value="">Seleccionar Raza</option>
-                            <option value="holstein" {{ old('raza') == 'holstein' ? 'selected' : '' }}>Holstein</option>
-                            <option value="brahman" {{ old('raza') == 'brahman' ? 'selected' : '' }}>Brahman</option>
-                            <option value="angus" {{ old('raza') == 'angus' ? 'selected' : '' }}>Angus</option>
-                            <option value="criolla" {{ old('raza') == 'criolla' ? 'selected' : '' }}>Criolla</option>
-                            <option value="otra" {{ old('raza') == 'otra' ? 'selected' : '' }}>Otra</option>
+                            <option value="holstein" {{ old('raza', $animal['raza']) == 'holstein' ? 'selected' : '' }}>Holstein</option>
+                            <option value="brahman" {{ old('raza', $animal['raza']) == 'brahman' ? 'selected' : '' }}>Brahman</option>
+                            <option value="angus" {{ old('raza', $animal['raza']) == 'angus' ? 'selected' : '' }}>Angus</option>
+                            <option value="criolla" {{ old('raza', $animal['raza']) == 'criolla' ? 'selected' : '' }}>Criolla</option>
+                            <option value="otra" {{ old('raza', $animal['raza']) == 'otra' ? 'selected' : '' }}>Otra</option>
                         </select>
                     </div>
 
@@ -112,12 +107,10 @@
                         <label for="fecha_nacimiento" class="form-label">
                             Fecha de Nacimiento <span class="text-danger">*</span>
                         </label>
-                        <input type="date" class="form-control @error('fecha_nacimiento') is-invalid @enderror" 
+                        <input type="date" class="form-control" 
                                id="fecha_nacimiento" name="fecha_nacimiento" 
                                value="{{ old('fecha_nacimiento', $animal['fecha_nacimiento']) }}" required>
-                        @error('fecha_nacimiento')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <small class="form-text text-muted">La fecha debe ser anterior a hoy</small>
                     </div>
                 </div>
 
@@ -125,57 +118,90 @@
                     <!-- Sexo -->
                     <div class="col-md-6 mb-3">
                         <label for="sexo" class="form-label">Sexo <span class="text-danger">*</span></label>
-                        <select class="form-select @error('sexo') is-invalid @enderror" 
-                                id="sexo" name="sexo" required>
+                        <select class="form-select" id="sexo" name="sexo" required>
                             <option value="">Seleccionar Sexo</option>
-                            <option value="macho" {{ (old('sexo', $animal['sexo']) == 'macho') ? 'selected' : '' }}>Macho</option>
-                            <option value="hembra" {{ (old('sexo', $animal['sexo']) == 'hembra') ? 'selected' : '' }}>Hembra</option>
+                            <option value="macho" {{ old('sexo', $animal['sexo']) == 'macho' ? 'selected' : '' }}>Macho</option>
+                            <option value="hembra" {{ old('sexo', $animal['sexo']) == 'hembra' ? 'selected' : '' }}>Hembra</option>
                         </select>
-                        @error('sexo')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
                     </div>
 
                     <!-- Estado -->
                     <div class="col-md-6 mb-3">
                         <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
-                        <select class="form-select @error('estado') is-invalid @enderror" 
-                                id="estado" name="estado" required>
+                        <select class="form-select" id="estado" name="estado" required>
                             <option value="">Seleccionar Estado</option>
-                            <option value="activo" {{ (old('estado', $animal['estado']) == 'activo') ? 'selected' : '' }}>Activo</option>
-                            <option value="enfermo" {{ (old('estado', $animal['estado']) == 'enfermo') ? 'selected' : '' }}>Enfermo</option>
-                            <option value="vendido" {{ (old('estado', $animal['estado']) == 'vendido') ? 'selected' : '' }}>Vendido</option>
-                            <option value="muerto" {{ (old('estado', $animal['estado']) == 'muerto') ? 'selected' : '' }}>Muerto</option>
+                            <option value="activo" {{ old('estado', $animal['estado']) == 'activo' ? 'selected' : '' }}>Activo</option>
+                            <option value="enfermo" {{ old('estado', $animal['estado']) == 'enfermo' ? 'selected' : '' }}>Enfermo</option>
+                            <option value="vendido" {{ old('estado', $animal['estado']) == 'vendido' ? 'selected' : '' }}>Vendido</option>
+                            <option value="muerto" {{ old('estado', $animal['estado']) == 'muerto' ? 'selected' : '' }}>Muerto</option>
                         </select>
-                        @error('estado')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <small class="form-text text-muted">Estado actual del animal</small>
                     </div>
                 </div>
 
                 <div class="row">
                     <!-- Peso Inicial -->
                     <div class="col-md-6 mb-3">
-                        <label for="peso_inicial" class="form-label">Peso Inicial (kg)</label>
-                        <input type="number" step="0.01" class="form-control @error('peso_inicial') is-invalid @enderror" 
+                        <label for="peso_inicial" class="form-label">Peso Inicial (lbs)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" 
                                id="peso_inicial" name="peso_inicial" 
                                value="{{ old('peso_inicial', $animal['peso_inicial']) }}" 
                                placeholder="Ej: 350.50">
-                        @error('peso_inicial')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <small class="form-text text-muted">Peso en libras al registro</small>
+                    </div>
+
+                    <!-- Peso Actual -->
+                    <div class="col-md-6 mb-3">
+                        <label for="peso_actual" class="form-label">Peso Actual (lbs)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" 
+                               id="peso_actual" name="peso_actual" 
+                               value="{{ old('peso_actual', $animal['peso_actual']) }}" 
+                               placeholder="Ej: 420.75">
+                        <small class="form-text text-muted">Peso actual en libras</small>
                     </div>
                 </div>
 
                 <!-- Observaciones -->
                 <div class="mb-3">
                     <label for="observaciones" class="form-label">Observaciones</label>
-                    <textarea class="form-control @error('observaciones') is-invalid @enderror" 
+                    <textarea class="form-control" 
                               id="observaciones" name="observaciones" 
-                              rows="3" placeholder="Observaciones adicionales...">{{ old('observaciones', $animal['observaciones']) }}</textarea>
-                    @error('observaciones')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
+                              rows="3" placeholder="Observaciones adicionales sobre el animal...">{{ old('observaciones', $animal['observaciones']) }}</textarea>
+                </div>
+
+                <!-- Información de Auditoría -->
+                <div class="card border-light mb-4">
+                    <div class="card-header bg-light">
+                        <h6 class="m-0 font-weight-bold text-muted">
+                            <i class="fas fa-history me-2"></i>Información de Auditoría
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-plus me-1"></i>
+                                    <strong>Registrado:</strong> 
+                                    @if(isset($animal['created_at']))
+                                    {{ \Carbon\Carbon::parse($animal['created_at'])->format('d/m/Y H:i') }}
+                                    @else
+                                    N/A
+                                    @endif
+                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar-check me-1"></i>
+                                    <strong>Última actualización:</strong> 
+                                    @if(isset($animal['updated_at']))
+                                    {{ \Carbon\Carbon::parse($animal['updated_at'])->format('d/m/Y H:i') }}
+                                    @else
+                                    N/A
+                                    @endif
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Botones -->
@@ -199,6 +225,62 @@
         // Establecer fecha máxima como hoy
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('fecha_nacimiento').max = today;
+        
+        // Validación del formulario
+        document.getElementById('animalForm').addEventListener('submit', function(e) {
+            const requiredFields = this.querySelectorAll('[required]');
+            let valid = true;
+            
+            console.log('Validando formulario de edición...');
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    valid = false;
+                    field.classList.add('is-invalid');
+                    console.log(`Campo requerido vacío: ${field.name}`);
+                } else {
+                    field.classList.remove('is-invalid');
+                }
+            });
+
+            // Validación adicional de fecha
+            const fechaField = document.getElementById('fecha_nacimiento');
+            if (fechaField.value) {
+                const selectedDate = new Date(fechaField.value);
+                const today = new Date();
+                if (selectedDate > today) {
+                    valid = false;
+                    fechaField.classList.add('is-invalid');
+                    console.log('Fecha futura no permitida');
+                    alert('La fecha de nacimiento no puede ser futura.');
+                }
+            }
+
+            // Validación de pesos
+            const pesoInicial = document.getElementById('peso_inicial');
+            const pesoActual = document.getElementById('peso_actual');
+            
+            if (pesoInicial.value && parseFloat(pesoInicial.value) <= 0) {
+                valid = false;
+                pesoInicial.classList.add('is-invalid');
+                alert('El peso inicial debe ser mayor a 0.');
+            }
+            
+            if (pesoActual.value && parseFloat(pesoActual.value) <= 0) {
+                valid = false;
+                pesoActual.classList.add('is-invalid');
+                alert('El peso actual debe ser mayor a 0.');
+            }
+            
+            if (!valid) {
+                e.preventDefault();
+                alert('Por favor complete todos los campos requeridos correctamente.');
+            } else {
+                console.log('Formulario válido, enviando actualización...');
+            }
+        });
+
+
     });
 </script>
 @endsection

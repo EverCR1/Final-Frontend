@@ -239,4 +239,82 @@ class ProduccionLecheController extends Controller
 
         return back()->with('error', $errorMessage)->withInput();
     }
+
+    public function obtenerDatosGraficaDashboard()
+    {
+        Log::info('Obteniendo datos de producción para gráfica del dashboard');
+        
+        // Obtener todas las producciones de los últimos 30 días
+        $fechaInicio = now()->subDays(30)->format('Y-m-d');
+        $fechaFin = now()->format('Y-m-d');
+        
+        $response = $this->apiService->get('produccion-leche', [
+            'fecha_inicio' => $fechaInicio,
+            'fecha_fin' => $fechaFin
+        ]);
+        
+        if ($response->successful()) {
+            $producciones = $response->json();
+            
+            // Procesar los datos para la gráfica
+            return $this->procesarDatosParaGrafica($producciones, $fechaInicio, $fechaFin);
+        }
+        
+        // En caso de error, retornar array vacío
+        return [
+            'fechas' => [],
+            'litros' => [],
+            'total_periodo' => 0,
+            'promedio_diario' => 0
+        ];
+    }
+
+    /**
+     * Procesar los datos de producción para formato de gráfica
+     */
+    private function procesarDatosParaGrafica($producciones, $fechaInicio, $fechaFin)
+    {
+        // Agrupar por fecha y sumar la producción
+        $produccionPorDia = [];
+        
+        foreach ($producciones as $produccion) {
+            $fecha = date('Y-m-d', strtotime($produccion['fecha']));
+            if (!isset($produccionPorDia[$fecha])) {
+                $produccionPorDia[$fecha] = 0;
+            }
+            $produccionPorDia[$fecha] += floatval($produccion['cantidad_leche']);
+        }
+        
+        // Crear array con todos los días del período
+        $fechas = [];
+        $litros = [];
+        $fechaActual = \Carbon\Carbon::parse($fechaInicio);
+        $fechaFinal = \Carbon\Carbon::parse($fechaFin);
+        
+        while ($fechaActual <= $fechaFinal) {
+            $fechaStr = $fechaActual->format('Y-m-d');
+            $fechaFormateada = $fechaActual->format('d/m');
+            
+            $fechas[] = $fechaFormateada;
+            $litros[] = $produccionPorDia[$fechaStr] ?? 0;
+            
+            $fechaActual->addDay();
+        }
+        
+        $totalPeriodo = array_sum($litros);
+        $diasConProduccion = count(array_filter($litros));
+        $promedioDiario = $diasConProduccion > 0 ? $totalPeriodo / $diasConProduccion : 0;
+        
+        return [
+            'fechas' => $fechas,
+            'litros' => $litros,
+            'total_periodo' => $totalPeriodo,
+            'promedio_diario' => round($promedioDiario, 2),
+            'dias_con_produccion' => $diasConProduccion,
+            'periodo' => [
+                'inicio' => $fechaInicio,
+                'fin' => $fechaFin
+            ]
+        ];
+    }
 }

@@ -124,14 +124,39 @@
                         </select>
                     </div>
 
+                    <!-- Estado -->
+                    <div class="col-md-6 mb-3">
+                        <label for="estado" class="form-label">Estado <span class="text-danger">*</span></label>
+                        <select class="form-select" id="estado" name="estado" required>
+                            <option value="">Seleccionar Estado</option>
+                            <option value="activo" {{ old('estado', 'activo') == 'activo' ? 'selected' : '' }}>Activo</option>
+                            <option value="enfermo" {{ old('estado') == 'enfermo' ? 'selected' : '' }}>Enfermo</option>
+                            <option value="vendido" {{ old('estado') == 'vendido' ? 'selected' : '' }}>Vendido</option>
+                            <option value="muerto" {{ old('estado') == 'muerto' ? 'selected' : '' }}>Muerto</option>
+                        </select>
+                        <small class="form-text text-muted">Estado actual del animal</small>
+                    </div>
+                </div>
+
+                <div class="row">
                     <!-- Peso Inicial -->
                     <div class="col-md-6 mb-3">
-                        <label for="peso_inicial" class="form-label">Peso Inicial (kg)</label>
-                        <input type="number" step="0.01" class="form-control" 
+                        <label for="peso_inicial" class="form-label">Peso Inicial (lbs)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" 
                                id="peso_inicial" name="peso_inicial" 
                                value="{{ old('peso_inicial') }}" 
                                placeholder="Ej: 350.50">
-                        <small class="form-text text-muted">Peso en kilogramos (opcional)</small>
+                        <small class="form-text text-muted">Peso en libras al registro (opcional)</small>
+                    </div>
+
+                    <!-- Peso Actual -->
+                    <div class="col-md-6 mb-3">
+                        <label for="peso_actual" class="form-label">Peso Actual (lbs)</label>
+                        <input type="number" step="0.01" min="0" class="form-control" 
+                               id="peso_actual" name="peso_actual" 
+                               value="{{ old('peso_actual') }}" 
+                               placeholder="Ej: 420.75">
+                        <small class="form-text text-muted">Peso actual en libras (opcional)</small>
                     </div>
                 </div>
 
@@ -194,6 +219,22 @@
                     alert('La fecha de nacimiento no puede ser futura.');
                 }
             }
+
+            // Validación de pesos
+            const pesoInicial = document.getElementById('peso_inicial');
+            const pesoActual = document.getElementById('peso_actual');
+            
+            if (pesoInicial.value && parseFloat(pesoInicial.value) <= 0) {
+                valid = false;
+                pesoInicial.classList.add('is-invalid');
+                alert('El peso inicial debe ser mayor a 0.');
+            }
+            
+            if (pesoActual.value && parseFloat(pesoActual.value) <= 0) {
+                valid = false;
+                pesoActual.classList.add('is-invalid');
+                alert('El peso actual debe ser mayor a 0.');
+            }
             
             if (!valid) {
                 e.preventDefault();
@@ -203,9 +244,6 @@
             }
         });
 
-        // Mostrar ayuda contextual
-        console.log('Formulario de creación de animal cargado');
-        console.log('Usuario actual:', @json(session('user')));
     });
 </script>
 @endsection

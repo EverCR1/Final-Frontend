@@ -29,6 +29,13 @@ class DashboardController extends Controller
             $data = $response->json();
         }
 
+        // Obtener datos de producción para la gráfica
+        $produccionController = new \App\Http\Controllers\Web\ProduccionLecheController($this->apiService);
+        $datosGrafica = $produccionController->obtenerDatosGraficaDashboard();
+        
+        // Incluir los datos en la respuesta
+        $data['estadisticas_generales']['grafica_produccion'] = $datosGrafica;
+
         return view('dashboard', compact('data'));
     }
 }

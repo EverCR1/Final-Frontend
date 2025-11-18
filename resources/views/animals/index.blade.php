@@ -7,7 +7,7 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">
-            <i class="fas fa-cow text-success"></i> Gestión de Animales
+            <i class="fas fa-horse text-success"></i> Gestión de Animales
         </h1>
         
         <!-- Botón Nuevo Animal - Solo Admin y Veterinario -->
@@ -21,19 +21,6 @@
         @endif
     </div>
 
-    @if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="fas fa-check-circle me-2"></i> {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
-
-    @if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="fas fa-exclamation-triangle me-2"></i> {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    @endif
 
     <!-- Información de permisos para Productor -->
     @if(session('user.role') === 'productor')
@@ -57,7 +44,7 @@
                 <table class="table table-bordered table-hover table-striped" id="animalsTable" width="100%" cellspacing="0">
                     <thead class="table-success">
                         <tr>
-                            <th>ID</th>
+                            <th>No</th>
                             <th>Identificación</th>
                             <th>Nombre</th>
                             <th>Especie</th>
@@ -69,9 +56,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($animals as $animal)
+                        @foreach($animals as $index => $animal)
                         <tr>
-                            <td><strong>#{{ $animal['id'] }}</strong></td>
+                            <td><strong>#{{ $index + 1 }}</strong></td>
                             <td>
                                 <span class="badge bg-primary">{{ $animal['identificacion'] }}</span>
                             </td>
@@ -83,8 +70,17 @@
                                 @endif
                             </td>
                             <td>
-                                <span class="badge bg-info text-dark text-capitalize">
-                                    <i class="fas fa-paw me-1"></i>{{ $animal['especie'] }}
+                                @php
+                                    $especies = [
+                                        'bovino' => ['fa-cow', 'primary', 'Bovino'],
+                                        'porcino' => ['fa-piggy', 'pink', 'Porcino'],
+                                        'caprino' => ['fa-goat', 'warning', 'Caprino'],
+                                        'ovina' => ['fa-sheep', 'light', 'Ovina']
+                                    ];
+                                    list($icono, $color, $texto) = $especies[$animal['especie']] ?? ['fa-paw', 'secondary', $animal['especie']];
+                                @endphp
+                                <span class="badge bg-{{ $color }} text-dark text-capitalize">
+                                    <i class="fas {{ $icono }} me-1"></i>{{ $texto }}
                                 </span>
                             </td>
                             <td>{{ $animal['raza'] }}</td>
