@@ -16,19 +16,37 @@ class ApiService
 
     public function login($email, $password)
     {
-        $response = Http::post("{$this->baseUrl}/api/login", [
-            'email' => $email,
-            'password' => $password,
-        ]);
+        try {
+            $response = Http::post("{$this->baseUrl}/api/login", [
+                'email' => $email,
+                'password' => $password,
+            ]);
 
-        if ($response->successful()) {
-            $data = $response->json();
-            Session::put('api_token', $data['access_token']);
-            Session::put('user', $data['user']);
-            return $data;
+            if ($response->successful()) {
+                $data = $response->json();
+                
+                if (isset($data['access_token'])) {
+                    Session::put('api_token', $data['access_token']);
+                    Session::put('user', $data['user']);
+                    return [
+                        'success' => true,
+                        'data' => $data
+                    ];
+                }
+            }
+
+            return [
+                'success' => false,
+                'status' => $response->status(),
+                'error' => 'Credenciales incorrectas'
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'error' => 'Error de conexión'
+            ];
         }
-
-        return null;
     }
 
     public function get($endpoint)

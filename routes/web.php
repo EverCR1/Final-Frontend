@@ -10,6 +10,7 @@ use App\Http\Controllers\Web\VacunacionController;
 use App\Http\Controllers\Web\ProduccionLecheController;  
 use App\Http\Controllers\Web\ReporteController;
 use App\Http\Controllers\Web\UserController;   
+use App\Http\Controllers\Web\AlimentacionController;   
 
 /*
 |--------------------------------------------------------------------------
@@ -120,6 +121,47 @@ Route::middleware(['web.auth'])->group(function () {
             Route::get('/animales-por-finca', [ReporteController::class, 'animalesPorFinca'])->name('reportes.animales-finca');
             Route::get('/produccion-mensual', [ReporteController::class, 'produccionMensual'])->name('reportes.produccion-mensual');
             Route::get('/salud-animal', [ReporteController::class, 'reporteSalud'])->name('reportes.salud-animal');
+        });
+    });
+
+    // ========== MÓDULO ALIMENTACIÓN ==========
+    // Solo Admin y Veterinario
+    Route::middleware(['role:admin,veterinario'])->group(function () {
+        Route::prefix('alimentacion')->group(function () {
+            // Dashboard principal
+            Route::get('/', [AlimentacionController::class, 'index'])->name('alimentacion.index');
+            
+            // Alimentos
+            Route::get('/alimentos', [AlimentacionController::class, 'alimentosIndex'])->name('alimentacion.alimentos.index');
+            Route::get('/alimentos/create', [AlimentacionController::class, 'alimentosCreate'])->name('alimentacion.alimentos.create');
+            Route::post('/alimentos', [AlimentacionController::class, 'alimentosStore'])->name('alimentacion.alimentos.store');
+            Route::get('/alimentos/{id}', [AlimentacionController::class, 'alimentosShow'])->name('alimentacion.alimentos.show');
+            Route::get('/alimentos/{id}/edit', [AlimentacionController::class, 'alimentosEdit'])->name('alimentacion.alimentos.edit');
+            Route::put('/alimentos/{id}', [AlimentacionController::class, 'alimentosUpdate'])->name('alimentacion.alimentos.update');
+            Route::delete('/alimentos/{id}', [AlimentacionController::class, 'alimentosDestroy'])->name('alimentacion.alimentos.destroy');
+            
+            // Dietas
+            Route::get('/dietas', [AlimentacionController::class, 'dietasIndex'])->name('alimentacion.dietas.index');
+            Route::get('/dietas/create', [AlimentacionController::class, 'dietasCreate'])->name('alimentacion.dietas.create');
+            Route::post('/dietas', [AlimentacionController::class, 'dietasStore'])->name('alimentacion.dietas.store');
+            Route::get('/dietas/{id}', [AlimentacionController::class, 'dietasShow'])->name('alimentacion.dietas.show');
+            Route::get('/dietas/{id}/edit', [AlimentacionController::class, 'dietasEdit'])->name('alimentacion.dietas.edit');
+            Route::put('/dietas/{id}', [AlimentacionController::class, 'dietasUpdate'])->name('alimentacion.dietas.update');
+            Route::delete('/dietas/{id}', [AlimentacionController::class, 'dietasDestroy'])->name('alimentacion.dietas.destroy');
+            
+            // Registros de Alimentación
+            Route::get('/registros', [AlimentacionController::class, 'registrosIndex'])->name('alimentacion.registros.index');
+            Route::get('/registros/create', [AlimentacionController::class, 'registrosCreate'])->name('alimentacion.registros.create');
+            Route::post('/registros', [AlimentacionController::class, 'registrosStore'])->name('alimentacion.registros.store');
+            Route::get('/registros/{id}', [AlimentacionController::class, 'registrosShow'])->name('alimentacion.registros.show');
+            Route::get('/registros/{id}/edit', [AlimentacionController::class, 'registrosEdit'])->name('alimentacion.registros.edit');
+            Route::put('/registros/{id}', [AlimentacionController::class, 'registrosUpdate'])->name('alimentacion.registros.update');
+            Route::delete('/registros/{id}', [AlimentacionController::class, 'registrosDestroy'])->name('alimentacion.registros.destroy');
+            
+            // Reportes y Alertas
+            Route::get('/reportes', [AlimentacionController::class, 'reportes'])->name('alimentacion.reportes');
+            Route::get('/alertas', [AlimentacionController::class, 'alertasStockBajo'])->name('alimentacion.alertas');
+            Route::post('/reportes/generar', [AlimentacionController::class, 'generarReporte'])->name('alimentacion.generar-reporte');
         });
     });
 

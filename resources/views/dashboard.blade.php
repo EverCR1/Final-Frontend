@@ -119,9 +119,17 @@
                 <h6 class="m-0 font-weight-bold">
                     <i class="fas fa-exclamation-triangle me-2"></i> Alertas del Sistema
                 </h6>
-                <span class="badge bg-danger">{{ $totalAlertas = ($data['estadisticas_generales']['medicamentos_stock_bajo'] ?? 0) + ($data['estadisticas_generales']['animales_enfermos'] ?? 0) + ($data['estadisticas_generales']['vacunaciones_proximas'] ?? 0) }}</span>
+                @php
+                    $totalAlertas = ($data['estadisticas_generales']['medicamentos_stock_bajo'] ?? 0) + 
+                                  ($data['estadisticas_generales']['animales_enfermos'] ?? 0) + 
+                                  ($data['estadisticas_generales']['vacunaciones_proximas'] ?? 0) +
+                                  ($data['estadisticas_generales']['medicamentos_vencidos'] ?? 0) +
+                                  (count($data['alimentacion']['stock_bajo'] ?? []) > 0 ? 1 : 0);
+                @endphp
+                <span class="badge bg-danger">{{ $totalAlertas }}</span>
             </div>
             <div class="card-body">
+                <!-- Alertas de Salud -->
                 @if(($data['estadisticas_generales']['medicamentos_stock_bajo'] ?? 0) > 0)
                 <div class="alert alert-warning d-flex align-items-center justify-content-between">
                     <div>
@@ -178,6 +186,32 @@
                 </div>
                 @endif
 
+                <!-- Alertas de Alimentación -->
+                @if(count($data['alimentacion']['stock_bajo'] ?? []) > 0)
+                <div class="alert alert-warning d-flex align-items-center justify-content-between" style="background-color: #ffe5d0; border-color: #ffb347; color: #8a4b00;">
+                    <div>
+                        <i class="fas fa-apple-alt me-2" style="color: #ff8c00;"></i>
+                        <strong>{{ count($data['alimentacion']['stock_bajo']) }} alimentos</strong> con stock bajo
+                    </div>
+                    <a href="{{ route('alimentacion.alimentos.index') }}?stock=bajo" class="btn btn-sm" style="background-color: #ff8c00; border-color: #ff8c00; color: white;">
+                        <i class="fas fa-box me-1"></i>Revisar Stock
+                    </a>
+                </div>
+                @endif
+
+                <!-- Alertas de dietas inactivas -->
+                @if(($data['alimentacion']['dietas_inactivas'] ?? 0) > 0)
+                <div class="alert alert-info d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fas fa-utensils me-2"></i>
+                        <strong>{{ $data['alimentacion']['dietas_inactivas'] }} dietas</strong> están inactivas
+                    </div>
+                    <a href="{{ route('alimentacion.dietas.index') }}?activa=false" class="btn btn-info btn-sm">
+                        <i class="fas fa-eye me-1"></i>Revisar
+                    </a>
+                </div>
+                @endif
+
                 @if($totalAlertas == 0)
                 <div class="alert alert-success text-center py-4">
                     <i class="fas fa-check-circle fa-2x mb-3"></i>
@@ -213,6 +247,14 @@
                 
                 <a href="{{ route('produccion-leche.create') }}" class="btn btn-primary btn-block mb-2 w-100 text-start">
                     <i class="fas fa-wine-bottle me-2"></i>Registrar Producción
+                </a>
+
+                <!-- Acciones rápidas de alimentación -->
+                <a href="{{ route('alimentacion.registros.create') }}" class="btn btn-success btn-block mb-2 w-100 text-start">
+                    <i class="fas fa-plus-circle me-2"></i>Registrar Alimentación
+                </a>
+                <a href="{{ route('alimentacion.alimentos.create') }}" class="btn btn-info btn-block mb-2 w-100 text-start">
+                    <i class="fas fa-apple-alt me-2"></i>Agregar Alimento
                 </a>
                 
                 @if(session('user.role') === 'admin')

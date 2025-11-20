@@ -21,6 +21,48 @@
         @endif
     </div>
 
+    <!-- Búsqueda y Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre, descripción...">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <select id="filterTipo" class="form-select">
+                <option value="">Todos los tipos</option>
+                <option value="vacuna">Vacuna</option>
+                <option value="antibiotico">Antibiótico</option>
+                <option value="vitaminas">Vitaminas</option>
+                <option value="desparasitante">Desparasitante</option>
+                <option value="otro">Otro</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select id="filterEstado" class="form-select">
+                <option value="">Todos los estados</option>
+                <option value="agotado">Agotado</option>
+                <option value="bajo">Stock Bajo</option>
+                <option value="disponible">Disponible</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select id="filterVencimiento" class="form-select">
+                <option value="">Todo vencimiento</option>
+                <option value="vencido">Vencido</option>
+                <option value="por_vencer">Por Vencer</option>
+                <option value="vigente">Vigente</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button id="clearFilters" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-times"></i> Limpiar
+            </button>
+        </div>
+    </div>
 
     <!-- Medicamentos Table -->
     <div class="card shadow mb-4">
@@ -28,7 +70,7 @@
             <h6 class="m-0 font-weight-bold text-info">
                 <i class="fas fa-list me-2"></i>Inventario de Medicamentos
             </h6>
-            <span class="badge bg-info">{{ count($medicamentos) }} medicamentos registrados</span>
+            <span class="badge bg-info" id="medicamentosCount">{{ count($medicamentos) }} medicamentos registrados</span>
         </div>
         <div class="card-body">
             @if(count($medicamentos) > 0)
@@ -189,4 +231,97 @@
         cursor: pointer;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const filterTipo = document.getElementById('filterTipo');
+        const filterEstado = document.getElementById('filterEstado');
+        const filterVencimiento = document.getElementById('filterVencimiento');
+        const clearFilters = document.getElementById('clearFilters');
+        const medicamentosCount = document.getElementById('medicamentosCount');
+        const table = document.getElementById('medicamentosTable');
+        const rows = table ? table.getElementsByTagName('tbody')[0].getElementsByTagName('tr') : [];
+        
+        function filterTable() {
+            const searchText = searchInput.value.toLowerCase();
+            const tipoValue = filterTipo.value;
+            const estadoValue = filterEstado.value;
+            const vencimientoValue = filterVencimiento.value;
+            
+            let visibleCount = 0;
+
+            for (let row of rows) {
+                const cells = row.getElementsByTagName('td');
+                const nombre = cells[1].textContent.toLowerCase();
+                const tipo = cells[2].textContent.toLowerCase();
+                const estado = cells[7].textContent.toLowerCase();
+                const vencimientoCell = cells[6];
+                
+                // Obtener el estado real del vencimiento basado en clases y contenido
+                let estadoVencimiento = 'vigente';
+                if (vencimientoCell.innerHTML.includes('fa-exclamation-triangle')) {
+                    estadoVencimiento = 'vencido';
+                } else if (vencimientoCell.innerHTML.includes('fa-clock')) {
+                    estadoVencimiento = 'por_vencer';
+                }
+
+                // Buscar en nombre y descripción
+                const matchesSearch = !searchText || 
+                    nombre.includes(searchText);
+
+                // Filtrar por tipo
+                const matchesTipo = !tipoValue || 
+                    tipo.includes(tipoValue.toLowerCase());
+
+                // Filtrar por estado
+                let matchesEstado = true;
+                if (estadoValue === 'agotado') {
+                    matchesEstado = estado.includes('agotado');
+                } else if (estadoValue === 'bajo') {
+                    matchesEstado = estado.includes('bajo');
+                } else if (estadoValue === 'disponible') {
+                    matchesEstado = estado.includes('disponible');
+                }
+
+                // Filtrar por vencimiento - CORREGIDO
+                let matchesVencimiento = true;
+                if (vencimientoValue === 'vencido') {
+                    matchesVencimiento = estadoVencimiento === 'vencido';
+                } else if (vencimientoValue === 'por_vencer') {
+                    matchesVencimiento = estadoVencimiento === 'por_vencer';
+                } else if (vencimientoValue === 'vigente') {
+                    matchesVencimiento = estadoVencimiento === 'vigente';
+                }
+
+                const isVisible = matchesSearch && matchesTipo && matchesEstado && matchesVencimiento;
+                row.style.display = isVisible ? '' : 'none';
+                
+                if (isVisible) {
+                    visibleCount++;
+                }
+            }
+
+            // Actualizar contador
+            medicamentosCount.textContent = visibleCount + ' medicamentos registrados';
+            medicamentosCount.className = visibleCount === 0 ? 'badge bg-danger' : 'badge bg-info';
+        }
+
+        // Event listeners
+        searchInput.addEventListener('keyup', filterTable);
+        filterTipo.addEventListener('change', filterTable);
+        filterEstado.addEventListener('change', filterTable);
+        filterVencimiento.addEventListener('change', filterTable);
+
+        clearFilters.addEventListener('click', function() {
+            searchInput.value = '';
+            filterTipo.value = '';
+            filterEstado.value = '';
+            filterVencimiento.value = '';
+            filterTable();
+        });
+    });
+</script>
 @endsection

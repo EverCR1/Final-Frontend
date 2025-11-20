@@ -21,6 +21,30 @@
         @endif
     </div>
 
+    <!-- Búsqueda y Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por nombre, email...">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <select id="filterRol" class="form-select">
+                <option value="">Todos los roles</option>
+                <option value="admin">Administrador</option>
+                <option value="veterinario">Veterinario</option>
+                <option value="productor">Productor</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button id="clearFilters" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-times"></i> Limpiar
+            </button>
+        </div>
+    </div>
 
     <!-- Users Table -->
     <div class="card shadow mb-4">
@@ -28,7 +52,7 @@
             <h6 class="m-0 font-weight-bold text-primary">
                 <i class="fas fa-list me-2"></i>Lista de Usuarios
             </h6>
-            <span class="badge bg-primary">{{ count($users) }} usuarios registrados</span>
+            <span class="badge bg-primary" id="usersCount">{{ count($users) }} usuarios registrados</span>
         </div>
         <div class="card-body">
             @if(count($users) > 0)
@@ -243,15 +267,95 @@
 
 @section('scripts')
 <script>
-    // Hacer filas clickeables para ver detalles
     document.addEventListener('DOMContentLoaded', function() {
-        const rows = document.querySelectorAll('#usersTable tbody tr');
+        const searchInput = document.getElementById('searchInput');
+        const filterRol = document.getElementById('filterRol');
+        const clearFilters = document.getElementById('clearFilters');
+        const usersCount = document.getElementById('usersCount');
+        const table = document.getElementById('usersTable');
+        const rows = table ? table.getElementsByTagName('tbody')[0].getElementsByTagName('tr') : [];
+        
+        function filterTable() {
+            const searchText = searchInput.value.toLowerCase();
+            const rolValue = filterRol.value;
+            
+            let visibleCount = 0;
+            let adminCount = 0, vetCount = 0, prodCount = 0;
+
+            for (let row of rows) {
+                const cells = row.getElementsByTagName('td');
+                const nombre = cells[1].textContent.toLowerCase();
+                const email = cells[2].textContent.toLowerCase();
+                const rol = cells[3].textContent.toLowerCase();
+
+                // Buscar en nombre y email
+                const matchesSearch = !searchText || 
+                    nombre.includes(searchText) ||
+                    email.includes(searchText);
+
+                // Filtrar por rol
+                let matchesRol = true;
+                if (rolValue === 'admin') {
+                    matchesRol = rol.includes('administrador');
+                } else if (rolValue === 'veterinario') {
+                    matchesRol = rol.includes('veterinario');
+                } else if (rolValue === 'productor') {
+                    matchesRol = rol.includes('productor');
+                }
+
+                const isVisible = matchesSearch && matchesRol;
+                row.style.display = isVisible ? '' : 'none';
+                
+                if (isVisible) {
+                    visibleCount++;
+                    // Contar por rol para estadísticas
+                    if (rol.includes('administrador')) adminCount++;
+                    else if (rol.includes('veterinario')) vetCount++;
+                    else if (rol.includes('productor')) prodCount++;
+                }
+            }
+
+            // Actualizar contador principal
+            usersCount.textContent = visibleCount + ' usuarios registrados';
+            usersCount.className = visibleCount === 0 ? 'badge bg-danger' : 'badge bg-primary';
+
+            // Actualizar estadísticas si existen
+            updateStatistics(adminCount, vetCount, prodCount, visibleCount);
+        }
+
+        function updateStatistics(adminCount, vetCount, prodCount, totalCount) {
+            // Actualizar tarjetas de estadísticas
+            const totalCard = document.querySelector('.card-border-left-primary .h5');
+            const adminCard = document.querySelector('.card-border-left-danger .h5');
+            const vetCard = document.querySelector('.card-border-left-warning .h5');
+            const prodCard = document.querySelector('.card-border-left-success .h5');
+
+            if (totalCard) totalCard.textContent = totalCount;
+            if (adminCard) adminCard.textContent = adminCount;
+            if (vetCard) vetCard.textContent = vetCount;
+            if (prodCard) prodCard.textContent = prodCount;
+        }
+
+        // Event listeners
+        searchInput.addEventListener('keyup', filterTable);
+        filterRol.addEventListener('change', filterTable);
+
+        clearFilters.addEventListener('click', function() {
+            searchInput.value = '';
+            filterRol.value = '';
+            filterTable();
+        });
+
+        // Hacer filas clickeables para ver detalles
         rows.forEach(row => {
             row.addEventListener('click', function(e) {
                 // Evitar click en botones de acciones
-                if (!e.target.closest('.btn-group')) {
-                    const userId = this.querySelector('td:first-child strong').textContent.replace('#', '');
-                    window.location.href = "{{ route('users.show', '') }}/" + userId;
+                if (!e.target.closest('.btn-group') && !e.target.closest('form')) {
+                    const firstCell = this.querySelector('td:first-child strong');
+                    if (firstCell) {
+                        const userId = firstCell.textContent.replace('#', '');
+                        window.location.href = "{{ route('users.show', '') }}/" + userId;
+                    }
                 }
             });
         });

@@ -59,7 +59,7 @@ class FincaController extends Controller
             'ubicacion' => 'required|string|max:255',
             'telefono' => 'nullable|string|max:20',
             'responsable' => 'required|string|max:255',
-            'zona' => 'required|in:norte,sur,este',
+            'zona' => 'required|in:norte,sur,este,oeste',
             'ip_subred' => 'nullable|string|max:18',
         ]);
 
@@ -134,7 +134,7 @@ class FincaController extends Controller
             'ubicacion' => 'required|string|max:255',
             'telefono' => 'nullable|string|max:20',
             'responsable' => 'required|string|max:255',
-            'zona' => 'required|in:norte,sur,este',
+            'zona' => 'required|in:norte,sur,este,oeste',
             'ip_subred' => 'nullable|string|max:18',
         ]);
 

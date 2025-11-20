@@ -21,6 +21,39 @@
         @endif
     </div>
 
+    <!-- Búsqueda y Filtros -->
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-search"></i>
+                </span>
+                <input type="text" id="searchInput" class="form-control" placeholder="Buscar por animal, veterinario, vacuna...">
+            </div>
+        </div>
+        <div class="col-md-2">
+            <select id="filterEstado" class="form-select">
+                <option value="">Todos los estados</option>
+                <option value="vencida">Vencida</option>
+                <option value="proxima">Próxima</option>
+                <option value="al_dia">Al día</option>
+                <option value="sin_proxima">Sin próxima</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <select id="filterFinca" class="form-select">
+                <option value="">Todas las fincas</option>
+                @foreach($fincas ?? [] as $finca)
+                    <option value="{{ $finca['nombre'] }}">{{ $finca['nombre'] }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button id="clearFilters" class="btn btn-outline-secondary w-100">
+                <i class="fas fa-times"></i> Limpiar
+            </button>
+        </div>
+    </div>
 
     <!-- Vacunaciones Table -->
     <div class="card shadow mb-4">
@@ -28,7 +61,7 @@
             <h6 class="m-0 font-weight-bold text-primary">
                 <i class="fas fa-list me-2"></i>Historial de Vacunaciones
             </h6>
-            <span class="badge bg-primary">{{ count($vacunaciones) }} registros</span>
+            <span class="badge bg-primary" id="vacunacionesCount">{{ count($vacunaciones) }} registros</span>
         </div>
         <div class="card-body">
             @if(count($vacunaciones) > 0)
@@ -183,4 +216,83 @@
         cursor: pointer;
     }
 </style>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const filterEstado = document.getElementById('filterEstado');
+        const filterFinca = document.getElementById('filterFinca');
+        const clearFilters = document.getElementById('clearFilters');
+        const vacunacionesCount = document.getElementById('vacunacionesCount');
+        const table = document.getElementById('vacunacionesTable');
+        const rows = table ? table.getElementsByTagName('tbody')[0].getElementsByTagName('tr') : [];
+        
+        function filterTable() {
+            const searchText = searchInput.value.toLowerCase();
+            const estadoValue = filterEstado.value;
+            const fincaValue = filterFinca.value;
+            
+            let visibleCount = 0;
+
+            for (let row of rows) {
+                const cells = row.getElementsByTagName('td');
+                const animal = cells[2].textContent.toLowerCase();
+                const finca = cells[3].textContent.toLowerCase();
+                const medicamento = cells[4].textContent.toLowerCase();
+                const vacuna = cells[5].textContent.toLowerCase();
+                const veterinario = cells[6].textContent.toLowerCase();
+                const estado = cells[8].textContent.toLowerCase();
+
+                // Buscar en múltiples campos
+                const matchesSearch = !searchText || 
+                    animal.includes(searchText) ||
+                    finca.includes(searchText) ||
+                    medicamento.includes(searchText) ||
+                    vacuna.includes(searchText) ||
+                    veterinario.includes(searchText);
+
+                // Filtrar por estado
+                let matchesEstado = true;
+                if (estadoValue === 'vencida') {
+                    matchesEstado = estado.includes('vencida');
+                } else if (estadoValue === 'proxima') {
+                    matchesEstado = estado.includes('próxima');
+                } else if (estadoValue === 'al_dia') {
+                    matchesEstado = estado.includes('al día');
+                } else if (estadoValue === 'sin_proxima') {
+                    matchesEstado = estado.includes('sin próxima');
+                }
+
+                // Filtrar por finca
+                const matchesFinca = !fincaValue || 
+                    finca.includes(fincaValue.toLowerCase());
+
+                const isVisible = matchesSearch && matchesEstado && matchesFinca;
+                row.style.display = isVisible ? '' : 'none';
+                
+                if (isVisible) {
+                    visibleCount++;
+                }
+            }
+
+            // Actualizar contador
+            vacunacionesCount.textContent = visibleCount + ' registros';
+            vacunacionesCount.className = visibleCount === 0 ? 'badge bg-danger' : 'badge bg-primary';
+        }
+
+        // Event listeners
+        searchInput.addEventListener('keyup', filterTable);
+        filterEstado.addEventListener('change', filterTable);
+        filterFinca.addEventListener('change', filterTable);
+
+        clearFilters.addEventListener('click', function() {
+            searchInput.value = '';
+            filterEstado.value = '';
+            filterFinca.value = '';
+            filterTable();
+        });
+    });
+</script>
 @endsection

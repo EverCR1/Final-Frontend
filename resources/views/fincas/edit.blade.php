@@ -78,6 +78,7 @@
                             <option value="norte" {{ (old('zona', $finca['zona']) == 'norte') ? 'selected' : '' }}>Zona Norte</option>
                             <option value="sur" {{ (old('zona', $finca['zona']) == 'sur') ? 'selected' : '' }}>Zona Sur</option>
                             <option value="este" {{ (old('zona', $finca['zona']) == 'este') ? 'selected' : '' }}>Zona Este</option>
+                            <option value="oeste" {{ (old('zona', $finca['zona']) == 'oeste') ? 'selected' : '' }}>Zona Oeste</option>
                         </select>
                     </div>
 

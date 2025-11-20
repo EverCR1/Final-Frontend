@@ -103,7 +103,12 @@
             padding: 15px 20px;
         }
 
-        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
         .login-header {
             padding: 1.5rem 2rem 1rem 2rem;
             text-align: center; 
@@ -189,6 +194,15 @@
             z-index: 10;
         }
 
+        .shake-animation {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
         
         @media (max-width: 768px) {
             .login-container {
@@ -215,19 +229,37 @@
                             </div>
                             <div class="brand-identity">
                                 <h2 class="brand-name">Sistema Inteligente de Gestión Ganadera</h2>
-                                
                             </div>
                         </div>
                     </div>
                     
                     <!-- Body -->
                     <div class="login-body">
+                        <!-- Mensajes de error -->
+                        @if($errors->any())
+                            <div class="alert alert-danger alert-dismissible fade show shake-animation" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                @foreach($errors->all() as $error)
+                                    {{ $error }}
+                                @endforeach
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
+
                         @if(session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            <i class="fas fa-exclamation-triangle me-2"></i>
-                            {{ session('error') }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
+                            <div class="alert alert-danger alert-dismissible fade show shake-animation" role="alert">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                {{ session('error') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        @endif
+
+                        @if(session('status'))
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                {{ session('status') }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
                         @endif
 
                         <form method="POST" action="{{ route('login.post') }}">
@@ -237,9 +269,15 @@
                                 <label for="email" class="form-label">
                                     <i class="fas fa-envelope me-2"></i>Correo Electrónico
                                 </label>
-                                <input type="email" class="form-control" id="email" name="email" 
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
+                                       id="email" name="email" 
                                        value="{{ old('email') }}" required autofocus
                                        placeholder="usuario@ejemplo.com">
+                                @error('email')
+                                    <div class="invalid-feedback">
+                                        {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
 
                             <div class="mb-4">
@@ -247,11 +285,17 @@
                                     <i class="fas fa-lock me-2"></i>Contraseña
                                 </label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="password" name="password" required
+                                    <input type="password" class="form-control @error('password') is-invalid @enderror" 
+                                           id="password" name="password" required
                                            placeholder="Ingresa tu contraseña">
                                     <button type="button" class="password-toggle" onclick="togglePassword()">
                                         <i class="fas fa-eye"></i>
                                     </button>
+                                    @error('password')
+                                        <div class="invalid-feedback">
+                                            {{ $message }}
+                                        </div>
+                                    @enderror
                                 </div>
                             </div>
 
@@ -318,6 +362,15 @@
             setTimeout(() => {
                 document.body.style.opacity = '1';
             }, 100);
+
+            // Agregar efecto shake a los campos con error
+            const invalidFields = document.querySelectorAll('.is-invalid');
+            invalidFields.forEach(field => {
+                field.classList.add('shake-animation');
+                setTimeout(() => {
+                    field.classList.remove('shake-animation');
+                }, 500);
+            });
         });
     </script>
 </body>

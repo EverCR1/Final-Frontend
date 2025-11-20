@@ -77,6 +77,7 @@
                             <option value="norte" {{ old('zona') == 'norte' ? 'selected' : '' }}>Zona Norte</option>
                             <option value="sur" {{ old('zona') == 'sur' ? 'selected' : '' }}>Zona Sur</option>
                             <option value="este" {{ old('zona') == 'este' ? 'selected' : '' }}>Zona Este</option>
+                            <option value="este" {{ old('zona') == 'oeste' ? 'selected' : '' }}>Zona Oste</option>
                         </select>
                     </div>
 

@@ -33,7 +33,17 @@ class ProduccionLecheController extends Controller
             $producciones = $response->json();
         }
 
-        return view('produccion-leche.index', compact('producciones'));
+        // Obtener fincas para el filtro
+        $fincasResponse = $this->apiService->get('fincas');
+        $fincas = [];
+        if ($fincasResponse->successful()) {
+            $fincas = $fincasResponse->json();
+        }
+
+        Log::info('Producciones obtenidas: ' . count($producciones));
+        Log::info('Fincas obtenidas: ' . count($fincas));
+
+        return view('produccion-leche.index', compact('producciones', 'fincas'));
     }
 
     /**

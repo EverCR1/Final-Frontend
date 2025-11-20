@@ -22,14 +22,14 @@ class VacunacionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+   public function index()
     {
         Log::info('Obteniendo listado de vacunaciones');
         
         // Verificar permisos - Solo admin y veterinario
         if (!in_array(session('user.role'), ['admin', 'veterinario'])) {
             return redirect()->route('dashboard')
-                           ->with('error', 'No tienes permisos para acceder a esta sección');
+                        ->with('error', 'No tienes permisos para acceder a esta sección');
         }
 
         $response = $this->apiService->get('vacunaciones');
@@ -37,10 +37,16 @@ class VacunacionController extends Controller
         $vacunaciones = [];
         if ($response->successful()) {
             $vacunaciones = $response->json();
-            
         }
 
-        return view('vacunaciones.index', compact('vacunaciones'));
+        // Obtener lista de fincas para el filtro
+        $fincasResponse = $this->apiService->get('fincas');
+        $fincas = [];
+        if ($fincasResponse->successful()) {
+            $fincas = $fincasResponse->json();
+        }
+
+        return view('vacunaciones.index', compact('vacunaciones', 'fincas'));
     }
 
     /**
