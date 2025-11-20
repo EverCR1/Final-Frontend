@@ -37,7 +37,7 @@ class AuthController extends Controller
             $request->password
         );
 
-        if ($result) {
+        if (isset($result['success']) && $result['success']) {
             return redirect()->route('dashboard')->with('success', 'Bienvenido al sistema');
         }
 

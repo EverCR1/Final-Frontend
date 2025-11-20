@@ -38,10 +38,15 @@ class AnimalController extends Controller
      */
     public function create()
     {
-         // Obtener fincas para el select
+        // Verificar roles permitidos
+        if (!in_array(session('user.role'), ['admin', 'veterinario'])) {
+            return redirect()->route('animals.index')
+                        ->with('error', 'No tienes permisos para crear animales');
+        }
+
         $fincasResponse = $this->apiService->get('fincas');
         $fincas = $fincasResponse->successful() ? $fincasResponse->json() : [];
-
+    
         return view('animals.create', compact('fincas'));
     }
 
